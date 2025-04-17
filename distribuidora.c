@@ -20,6 +20,8 @@ void insertarNodo(Nodo **start, Nodo *Nodo);
 void pedirDatos(Nodo *Nodo, int idTarea);
 void cargarTareas(Nodo **start);
 void transferirTareas(Nodo **start, Nodo **realizadas);
+void mostrarTareas (Nodo **start, Nodo **realizadas);
+void mostrarNodo (Nodo *Nodo);
 
 int main()
 {
@@ -28,6 +30,7 @@ int main()
 
     cargarTareas(&Start);
     transferirTareas(&Start, &realizadas);
+    mostrarTareas(&Start, &realizadas);
 
     return 0;
 }
@@ -83,28 +86,66 @@ void cargarTareas(Nodo **Start) {
 }
 
 void transferirTareas(Nodo **start, Nodo **realizadas) {
-    Nodo * temp = *start;
+    Nodo *actual = *start;
+    Nodo *anterior = NULL;
 
-    while (temp != NULL)
-    {
-        printf("ID: %d\n", temp->T.TareaID);
-        printf("Descripcion: %s\n", temp->T.Descripcion);
-        printf("Duracion: %d\n", temp->T.Duracion);
+    while (actual != NULL) {
+        printf("\n--------------------------\n");
+        printf("ID: %d\n", actual->T.TareaID);
+        printf("Descripcion: %s\n", actual->T.Descripcion);
+        printf("Duracion: %d\n", actual->T.Duracion);
 
         char respuesta;
         printf("Marcar esta tarea como realizada? (s/n): ");
-        scanf("% c", &respuesta);
+        scanf(" %c", &respuesta);
 
-        if (respuesta == 's')
-        {
-            Nodo *tareaRealizada = temp;
-            temp = temp->Siguiente;
-        
+        if (respuesta == 's') {
+            Nodo *tareaRealizada = actual;
+
+            actual = actual->Siguiente;
+
+            // Eliminar de la lista de pendientes
+            if (anterior == NULL) { // // Caso unicamaente para eliminar el primer nodo  
+                *start = actual;
+            } else {
+                anterior->Siguiente = actual;
+            }
+
+            // Insertar en la lista de realizadas
             tareaRealizada->Siguiente = NULL;
-            insertarNodo(realizadas, tareaRealizada);  // Insertar en la lista de realizadas
+            insertarNodo(realizadas, tareaRealizada);
+
         } else {
-            temp = temp->Siguiente;  // Solo avanzar a la siguiente tarea
+            anterior = actual;
+            actual = actual->Siguiente;
         }
-        
-    }  
+    }
+}
+
+void mostrarTareas (Nodo **start, Nodo **realizadas) {
+    Nodo *pendientes = *start;
+    Nodo *terminadas = *realizadas;
+
+    printf("\n------------Tareas Pendientes------------\n");
+    while (pendientes) {
+        mostrarNodo(pendientes);
+        pendientes = pendientes->Siguiente;
+    }
+
+    // Mostrar tareas realizadas
+    printf("\n------------Tareas Realizadas------------\n");
+    while (terminadas) {
+        mostrarNodo(terminadas);
+        terminadas = terminadas->Siguiente;
+    } 
+}
+
+void mostrarNodo (Nodo *Nodo) {
+    if (Nodo != NULL)
+    {
+        printf("\nID: %d\n", Nodo->T.TareaID);
+        printf("Descripcion: %s", Nodo->T.Descripcion);
+        printf("Duracion: %d\n", Nodo->T.Duracion);
+    }
+    
 }
